@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import sqlite3
 import datetime
+from pydantic import BaseModel
 
 app = FastAPI()
 
@@ -18,6 +19,16 @@ app.add_middleware(
 )
 
 appDB = "weight_tracker.db"
+
+class Weight(BaseModel):
+    id: int
+    weight: float
+    timestamp: datetime.datetime
+
+class User(BaseModel):
+    id: int
+    name: str
+    height: float
 
 @app.get("/")
 async def read_root():
@@ -44,5 +55,34 @@ async def log_weight(id: int, weight: float):
         connection.commit()
         connection.close()
         return {"message": "Logging weight tracking data", "data": data}
+    except Exception as e:
+        return {"error": str(e)}
+    
+    
+@app.get("/id/{id}/latest_weight", response_model=Weight)
+async def get_latest_weight(id: int):
+    try:
+        query = """SELECT * FROM weight WHERE id = ? ORDER BY timestamp DESC"""
+        connection = sqlite3.connect(appDB)
+        cursor = connection.cursor()
+        result = cursor.execute(query, (id,))
+        data = result.fetchone()
+        connection.close()
+        weight_data = Weight(id=data[0], weight=data[1], timestamp=data[2] ) 
+        return weight_data.model_dump()
+    except Exception as e:
+        return {"error": str(e)}
+    
+@app.get("/id/{id}/user", response_model=User)
+async def get_user(id: int):
+    try:
+        query = """SELECT * FROM user WHERE id = ?"""
+        connection = sqlite3.connect(appDB)
+        cursor = connection.cursor()
+        result = cursor.execute(query, (id,))
+        data = result.fetchone()
+        connection.close()
+        user_data = User(id=data[0], name=data[1], height=data[2] ) 
+        return user_data.model_dump()
     except Exception as e:
         return {"error": str(e)}

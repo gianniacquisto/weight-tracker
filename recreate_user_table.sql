@@ -1,0 +1,3 @@
+-- SQLite
+DROP TABLE user;
+CREATE TABLE user(id INTEGER PRIMARY KEY, name TEXT, height REAL);
