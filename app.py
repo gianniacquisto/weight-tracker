@@ -34,21 +34,13 @@ class User(BaseModel):
 async def read_root():
     return {"message": "Welcome to the weight tracker!"}
 
-@app.get("/id/{id}/data")
-async def get_data(id: int):
-    connection = sqlite3.connect(appDB)
-    cursor = connection.cursor()
-    res = cursor.execute("SELECT * from weight")
-    data = res.fetchall()
-    connection.close()
-    return {"message": "Weight tracking data", "data": data}
 
 @app.post("/id/{id}/log_weight")
 async def log_weight(id: int, weight: float):
     try:
         current_timestamp = datetime.datetime.now()
         data = (id, weight, current_timestamp)
-        query = """INSERT INTO weight (id, weight, timestamp) VALUES (?, ?, ?)"""
+        query = "INSERT INTO weight (id, weight, timestamp) VALUES (?, ?, ?)"
         connection = sqlite3.connect(appDB)
         cursor = connection.cursor()
         cursor.execute(query, data)
@@ -62,7 +54,7 @@ async def log_weight(id: int, weight: float):
 @app.get("/id/{id}/latest_weight", response_model=Weight)
 async def get_latest_weight(id: int):
     try:
-        query = """SELECT * FROM weight WHERE id = ? ORDER BY timestamp DESC"""
+        query = "SELECT * FROM weight WHERE id = ? ORDER BY timestamp DESC LIMIT 1"
         connection = sqlite3.connect(appDB)
         cursor = connection.cursor()
         result = cursor.execute(query, (id,))
@@ -76,7 +68,7 @@ async def get_latest_weight(id: int):
 @app.get("/id/{id}/user", response_model=User)
 async def get_user(id: int):
     try:
-        query = """SELECT * FROM user WHERE id = ?"""
+        query = "SELECT * FROM user WHERE id = ?"
         connection = sqlite3.connect(appDB)
         cursor = connection.cursor()
         result = cursor.execute(query, (id,))
