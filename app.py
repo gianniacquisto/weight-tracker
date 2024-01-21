@@ -30,6 +30,12 @@ class User(BaseModel):
     name: str
     height: float
 
+class Bmi(BaseModel):
+    id: int
+    weight: float
+    height: float
+    bmi: float
+
 @app.get("/")
 async def read_root():
     return {"message": "Welcome to the weight tracker!"}
@@ -75,6 +81,21 @@ async def get_user(id: int):
         data = result.fetchone()
         connection.close()
         user_data = User(id=data[0], name=data[1], height=data[2] ) 
+        print(user_data.model_dump().get("name"))
         return user_data.model_dump()
     except Exception as e:
         return {"error": str(e)}
+    
+@app.get("/id/{id}/bmi", response_model=Bmi)
+async def get_bmi(id: int):
+    try:
+        latest_weight = await get_latest_weight(id)
+        weight = latest_weight.get("weight")
+        user = await get_user(id)
+        height = user.get("height")
+        bmi = weight/(height*height)
+        bmi_data = Bmi(id=id, weight=weight, height=height, bmi=bmi)
+        return bmi_data.model_dump()
+    except Exception as e:
+        return {"error": str(e)}
+
