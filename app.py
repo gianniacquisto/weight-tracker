@@ -40,7 +40,6 @@ class Bmi(BaseModel):
 async def read_root():
     return {"message": "Welcome to the weight tracker!"}
 
-
 @app.post("/id/{id}/log_weight")
 async def log_weight(id: int, weight: float):
     try:
@@ -55,7 +54,6 @@ async def log_weight(id: int, weight: float):
         return {"message": "Logging weight tracking data", "data": data}
     except Exception as e:
         return {"error": str(e)}
-    
     
 @app.get("/id/{id}/latest_weight", response_model=Weight)
 async def get_latest_weight(id: int):
@@ -98,4 +96,3 @@ async def get_bmi(id: int):
         return bmi_data.model_dump()
     except Exception as e:
         return {"error": str(e)}
-
