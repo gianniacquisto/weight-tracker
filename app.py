@@ -96,3 +96,21 @@ async def get_bmi(id: int):
         return bmi_data.model_dump()
     except Exception as e:
         return {"error": str(e)}
+    
+@app.post("/id/{id}/update_user")
+async def update_user(id: int, name: str, height: float):
+    try:
+        data = (name, height, id)
+        query = """
+                UPDATE user 
+                SET name = ?, height = ?
+                WHERE id = ?;
+                """
+        connection = sqlite3.connect(appDB)
+        cursor = connection.cursor()
+        cursor.execute(query, data)
+        connection.commit()
+        connection.close()
+        return {"message": "Updated user data", "data": data}
+    except Exception as e:
+        return {"error": str(e)}
