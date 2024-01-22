@@ -1,6 +1,8 @@
 version: '3'
 services:
   web:
-    image: "weight-tracker:latest"
+    image: "weighttracker:latest"
+    volumes:
+      - ./weight_tracker.db:/weight_tracker.db
     ports:
       - "8000:8000"

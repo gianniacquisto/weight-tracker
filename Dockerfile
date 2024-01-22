@@ -1,7 +1,6 @@
 FROM python:3.12-slim-bookworm
-# Or any preferred Python version.
+ADD requirements.txt .
+RUN pip install -r requirements.txt
 ADD app.py .
-RUN pip install fastapi uvicorn
-# CMD [“uvicorn”, “app:app”] 
-CMD [“python”, “./app.py”]
-# Or enter the name of your unique directory and parameter set.
+EXPOSE 8000
+ENTRYPOINT ["uvicorn", "app:app"]
