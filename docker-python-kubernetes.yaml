@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: weighttracker
-        image: weighttracker:latest #gianniacquisto/weight-tracker
+        image: gianniacquisto/weight-tracker
         imagePullPolicy: Always
         ports:
         - containerPort: 8000
