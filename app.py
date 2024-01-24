@@ -8,9 +8,7 @@ from pydantic import BaseModel
 app = FastAPI()
 
 
-origins = [
-    "http://localhost:5173"
-]
+origins = ["http://localhost:5173"]
 
 
 app.add_middleware(
@@ -68,13 +66,15 @@ async def log_weight(id: int, weight: float):
 @app.get("/id/{id}/latest_weight", response_model=Weight)
 async def get_latest_weight(id: int):
     try:
-        query = "SELECT * FROM weight WHERE id = ? ORDER BY timestamp DESC LIMIT 1"
+        query = """
+        SELECT * FROM weight WHERE id = ? ORDER BY timestamp DESC LIMIT 1
+        """
         connection = sqlite3.connect(appDB)
         cursor = connection.cursor()
         result = cursor.execute(query, (id,))
         data = result.fetchone()
         connection.close()
-        weight_data = Weight(id=data[0], weight=data[1], timestamp=data[2] ) 
+        weight_data = Weight(id=data[0], weight=data[1], timestamp=data[2])
         return weight_data.model_dump()
     except Exception as e:
         return {"error": str(e)}
@@ -89,7 +89,7 @@ async def get_user(id: int):
         result = cursor.execute(query, (id,))
         data = result.fetchone()
         connection.close()
-        user_data = User(id=data[0], name=data[1], height=data[2] ) 
+        user_data = User(id=data[0], name=data[1], height=data[2])
         print(user_data.model_dump().get("name"))
         return user_data.model_dump()
     except Exception as e:
@@ -109,13 +109,13 @@ async def get_bmi(id: int):
     except Exception as e:
         return {"error": str(e)}
 
-    
+
 @app.post("/id/{id}/update_user")
 async def update_user(id: int, name: str, height: float):
     try:
         data = (name, height, id)
         query = """
-                UPDATE user 
+                UPDATE user
                 SET name = ?, height = ?
                 WHERE id = ?;
                 """
