@@ -4,11 +4,14 @@ import sqlite3
 import datetime
 from pydantic import BaseModel
 
+
 app = FastAPI()
+
 
 origins = [
     "http://localhost:5173"
 ]
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -18,17 +21,21 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 appDB = "weight_tracker.db"
+
 
 class Weight(BaseModel):
     id: int
     weight: float
     timestamp: datetime.datetime
 
+
 class User(BaseModel):
     id: int
     name: str
     height: float
+
 
 class Bmi(BaseModel):
     id: int
@@ -36,9 +43,11 @@ class Bmi(BaseModel):
     height: float
     bmi: float
 
+
 @app.get("/")
 async def read_root():
     return {"message": "Welcome to the weight tracker!"}
+
 
 @app.post("/id/{id}/log_weight")
 async def log_weight(id: int, weight: float):
@@ -54,7 +63,8 @@ async def log_weight(id: int, weight: float):
         return {"message": "Logging weight tracking data", "data": data}
     except Exception as e:
         return {"error": str(e)}
-    
+
+
 @app.get("/id/{id}/latest_weight", response_model=Weight)
 async def get_latest_weight(id: int):
     try:
@@ -68,7 +78,8 @@ async def get_latest_weight(id: int):
         return weight_data.model_dump()
     except Exception as e:
         return {"error": str(e)}
-    
+
+
 @app.get("/id/{id}/user", response_model=User)
 async def get_user(id: int):
     try:
@@ -83,7 +94,8 @@ async def get_user(id: int):
         return user_data.model_dump()
     except Exception as e:
         return {"error": str(e)}
-    
+
+
 @app.get("/id/{id}/bmi", response_model=Bmi)
 async def get_bmi(id: int):
     try:
@@ -96,6 +108,7 @@ async def get_bmi(id: int):
         return bmi_data.model_dump()
     except Exception as e:
         return {"error": str(e)}
+
     
 @app.post("/id/{id}/update_user")
 async def update_user(id: int, name: str, height: float):
